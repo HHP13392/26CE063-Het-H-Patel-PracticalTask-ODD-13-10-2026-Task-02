@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Calculate a campus library late-return fine by late days, number of books, and member type.">
+    <title>Library Late-Return Fine Calculator - Practical Assessment</title>
+    <style>
+        * { box-sizing: border-box; }
+        :root { color-scheme: light; --ink: #18243a; --muted: #5f6b7e; --line: #dce3ee; --blue: #2457d6; --pale: #f4f7fc; }
+        body { margin: 0; background: #f5f7fb; color: var(--ink); font: 16px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+        .site-header { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 18px max(22px, calc((100vw - 1060px)/2)); background: #fff; border-bottom: 1px solid var(--line); }
+        .site-header h1 { margin: 0; color: var(--blue); font-size: 1.35rem; }
+        .nav-links { display: flex; gap: 20px; }
+        a { color: var(--blue); font-weight: 650; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        main { width: min(100% - 36px, 960px); margin: 38px auto; }
+        #calculator > h2 { font-size: clamp(1.6rem, 4vw, 2.2rem); margin: 0 0 20px; letter-spacing: -.03em; }
+        .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .card { padding: 24px; background: #fff; border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 5px 20px #2436530b; }
+        .card h3 { margin: 0 0 16px; font-size: 1.1rem; }
+        .input-group { display: grid; gap: 10px; }
+        label { font-weight: 650; margin-top: 3px; }
+        input, select { width: 100%; min-height: 46px; padding: 9px 11px; font: inherit; color: var(--ink); background: #fff; border: 1px solid #cbd5e3; border-radius: 8px; }
+        input:focus-visible, select:focus-visible, button:focus-visible, a:focus-visible { outline: 3px solid #91adff; outline-offset: 2px; }
+        button { min-height: 48px; margin-top: 8px; padding: 10px 16px; border: 0; border-radius: 9px; background: var(--blue); color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+        button:hover { background: #1946b8; }
+        .policy-card p { margin: 0 0 14px; color: var(--muted); }
+        .notice { margin: 22px 0; padding: 18px 20px; border: 1px solid #f0d895; border-left: 5px solid #d99b16; border-radius: 10px; background: #fff9e8; }
+        .notice h2 { margin: 0 0 4px; font-size: 1.05rem; }
+        .notice p { margin: 0; }
+        .result-card { margin-top: 22px; }
+        .result-card h2 { margin: 0 0 8px; font-size: 1.35rem; }
+        #result { margin: 0 0 18px; font-size: 1.1rem; font-weight: 700; color: var(--blue); }
+        #result.error { color: #ad2f38; }
+        #breakdown { white-space: pre-wrap; overflow-wrap: anywhere; margin: 0; padding: 14px; background: var(--pale); border-radius: 8px; font: .93rem/1.6 ui-monospace, SFMono-Regular, Consolas, monospace; }
+        .site-footer { padding: 18px; text-align: center; background: #fff; border-top: 1px solid var(--line); color: var(--muted); }
+        .site-footer p { margin: 0; }
+        @media (max-width: 640px) {
+            .site-header { align-items: flex-start; flex-direction: column; padding: 16px 20px; gap: 10px; }
+            .nav-links { gap: 18px; }
+            main { width: min(100% - 24px, 520px); margin: 24px auto; }
+            .cards { grid-template-columns: 1fr; }
+            .card { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header" id="top">
+        <h1 id="pageTitle">Campus Library</h1>
+        <nav class="nav-links" aria-label="Main navigation">
+            <a href="#calculator">Fine calculator</a>
+            <a href="#results">Results</a>
+        </nav>
+    </header>
+
+    <main>
+        <section id="calculator" aria-labelledby="calculator-title">
+            <h2 id="calculator-title">Library Late-Return Fine Calculator</h2>
+            <div class="cards">
+                <article class="card">
+                    <h3>Enter information</h3>
+                    <div class="input-group">
+                        <label for="lateDays">Late days (0–10)</label>
+                        <input id="lateDays" type="number" value="5" min="0" max="10" step="1" inputmode="numeric">
+                        <label for="bookCount">Number of books (1–5)</label>
+                        <input id="bookCount" type="number" value="2" min="1" max="5" step="1" inputmode="numeric">
+                        <label for="memberType">Member type</label>
+                        <select id="memberType">
+                            <option value="Student">Student</option>
+                            <option value="Staff">Staff</option>
+                            <option value="Visitor">Visitor</option>
+                        </select>
+                        <button type="button" onclick="calculateFineBill()">Calculate</button>
+                    </div>
+                </article>
+                <article class="card policy-card">
+                    <h3>Calculation policy</h3>
+                    <p>Fine per late day per book: Student ₹5, Staff ₹3, Visitor ₹10. Processing charge: ₹10 only when the fine is greater than zero.</p>
+                    <p>Use the Calculate button to check the result and the detailed summary.</p>
+                </article>
+            </div>
+        </section>
+
+        <aside class="notice" aria-labelledby="notice-title">
+            <h2 id="notice-title">Important Note</h2>
+            <p>Please check that the late days, number of books, and member type are correct before calculating.</p>
+        </aside>
+
+        <section id="results" class="card result-card" aria-live="polite" aria-atomic="true">
+            <h2>Calculated result</h2>
+            <p id="result">Enter values and select Calculate.</p>
+            <h3>Detailed summary</h3>
+            <pre id="breakdown">The breakdown will appear here.</pre>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <p>Campus Library — ITUS102 | Web Technology Framework</p>
+    </footer>
+    <script>
+        'use strict';
+        function calculateFineBill() {
+            const rates = { Student: 5, Staff: 3, Visitor: 10 };
+            const processingCharge = 10;
+            const lateInput = document.getElementById('lateDays');
+            const booksInput = document.getElementById('bookCount');
+            const memberInput = document.getElementById('memberType');
+            const result = document.getElementById('result');
+            const breakdown = document.getElementById('breakdown');
+            result.classList.remove('error');
+
+            const lateDays = Number(lateInput.value);
+            const bookCount = Number(booksInput.value);
+            const memberType = memberInput.value;
+            const valid = lateInput.value.trim() !== '' && booksInput.value.trim() !== ''
+                && Number.isInteger(lateDays) && lateDays >= 0 && lateDays <= 10
+                && Number.isInteger(bookCount) && bookCount >= 1 && bookCount <= 5
+                && Object.prototype.hasOwnProperty.call(rates, memberType);
+
+            if (!valid) {
+                result.textContent = 'Invalid input. Enter late days from 0 to 10 and a whole number of books from 1 to 5.';
+                result.classList.add('error');
+                breakdown.textContent = 'No calculation was made. Please correct the input values and try again.';
+                return;
+            }
+
+            const rate = rates[memberType];
+            const lateFine = lateDays * bookCount * rate;
+            const charge = lateFine > 0 ? processingCharge : 0;
+            const total = lateFine + charge;
+            const rupees = amount => `₹${amount.toFixed(2)}`;
+            result.textContent = `Total fine: ${rupees(total)}`;
+            breakdown.textContent = [
+                `Member type: ${memberType}`,
+                `Late days: ${lateDays}`,
+                `Number of books: ${bookCount}`,
+                `Rate: ${rupees(rate)} per late day per book`,
+                `Late fine: ${lateDays} × ${bookCount} × ${rupees(rate)} = ${rupees(lateFine)}`,
+                `Processing charge: ${rupees(charge)}${charge === 0 ? ' (not charged because the fine is zero)' : ''}`,
+                `TOTAL: ${rupees(total)}`
+            ].join('\n');
+        }
+    </script>
+</body>
+</html>

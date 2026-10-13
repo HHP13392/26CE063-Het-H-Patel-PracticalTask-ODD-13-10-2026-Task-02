@@ -1,0 +1,37 @@
+ITUS102 - PRACTICAL EXAMINATION | DEBUGGING AND IMPLEMENTATION REPORT
+Date: 13-10-2026 | Task 02 - Library Late-Return Fine Calculator
+
+Enrollment No.: 26CE063
+Name: Het H Patel
+
+SIMPLE BUGS (write a brief explanation for each)
+Bug | Original problem 								| Correction made						|Why required
+S1  |HTML was missing UTF-8 charset and responsive viewport metadata.|           		Added charset UTF-8 and viewport meta elements.   |Displays ₹ correctly and fits mobile screens.
+S2  |  Calculator navigation linked to misspelled “#calcuator”.          	        |                 		Changed link to “#calculator”		        |Allows navigation to the calculator section.
+S3  |  Required Important Note semantic aside was absent.                |      			Added an aside with heading and input-check reminder. |Completes the required semantic HTML structure.
+S4  |  Calculation did not reliably apply rates by member type.                |                                   Implemented Student ₹5, Staff ₹3, Visitor ₹10 per day per book.   |Ensures correct member-specific fine calculation.
+S5  |  Input ranges and whole-number values were not fully checked.              |  	                Validated late days 0–10 and books 1–5 as integers.    |Prevents invalid or out-of-range calculations.
+S6  |Processing charge could be incorrectly applied when fine was zero.           |		Adds ₹10 processing charge only when late fine is greater than zero. |Follows the stated calculation policy.
+
+CODE COMPLETION / IMPLEMENTATION (briefly state what was completed)
+M1:	Added UTF-8 and responsive viewport metadata.
+M2:	Added the required Important Note aside.
+M3:	Corrected the calculator navigation anchor.
+M4:	Implemented fine calculation for Student, Staff, and Visitor rates.
+M5:	Added conditional ₹10 processing fee and detailed calculation breakdown.
+M6:	Added responsive styling, accessible focus/labels, and result announcement.
+D1:	Added validation for integer late days 0–10 and integer book count 1–5.
+D2:	Formatted results in rupees and explained the formula in the breakdown.
+D3:	Made the page self-contained by embedding CSS and JavaScript in index.html.
+
+FUNCTIONAL TEST
+
+Test input: Late days = 5; Number of books = 2; Member type = Student.
+Observed result: 5 × 2 × ₹5 = ₹50 fine + ₹10 processing = ₹60.00 total. At 0 late days, total is ₹0.00 and no processing fee is charged.
+Mobile layout checked (Yes/No): Yes
+
+
+GIT VERSION CONTROL
+
+git log -1 --oneline output: Not available — no Git repository was supplied.
+GitHub URL (if available): Not available.
